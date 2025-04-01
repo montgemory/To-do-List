@@ -49,8 +49,35 @@ app.get('/', (req, res) => {
 app.use('/api/todos', todoRoutes);
 
 // 错误处理中间件
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
+app.use((err, req, req, res, next) => {
+  console.error('Error details:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    body: req.body,
+    headers: req.headers
+  });
+
+  // 数据库连接错误
+  if (err.code === 'ECONNREFUSED') {
+    return res.status(503).json({
+      success: false,
+      message: '数据库连接失败',
+      error: err.message
+    });
+  }
+
+  // 数据库查询错误
+  if (err.code === '42P01') {
+    return res.status(500).json({
+      success: false,
+      message: '数据库表不存在',
+      error: err.message
+    });
+  }
+
+  // 默认错误响应
   res.status(500).json({
     success: false,
     message: '服务器错误',
