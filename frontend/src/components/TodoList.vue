@@ -4,6 +4,13 @@ import { useTodoStore } from '@/stores/todo';
 import TodoItem from '@/components/TodoItem.vue';
 import Sortable from 'sortablejs';
 
+// 定义Sortable.js的事件类型
+interface SortableEvent {
+  item: HTMLElement;
+  newIndex: number | null;
+  oldIndex: number;
+}
+
 const todoStore = useTodoStore();
 const listEl = ref<HTMLElement | null>(null);
 
@@ -14,7 +21,7 @@ onMounted(() => {
   if (listEl.value) {
     Sortable.create(listEl.value, {
       animation: 150,
-      onEnd: async (evt) => {
+      onEnd: async (evt: SortableEvent) => {
         const todoId = Number(evt.item.getAttribute('data-id'));
         const newPosition = evt.newIndex || 0;
         
