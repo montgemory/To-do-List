@@ -7,6 +7,10 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
+  const apiUrl = mode === 'production' 
+    ? 'https://to-do-list-production-1d6e.up.railway.app/api'
+    : 'http://localhost:3002/api'
+
   return {
     plugins: [
       vue(),
@@ -26,7 +30,7 @@ export default defineConfig(({ mode }) => {
       target: 'esnext'
     },
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL)
+      'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl)
     }
   }
 })

@@ -13,6 +13,21 @@ const apiClient = axios.create({
   }
 });
 
+// 添加响应拦截器
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
+
 export interface Todo {
   id: number;
   title: string;
