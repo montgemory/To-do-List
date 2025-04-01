@@ -13,7 +13,16 @@ const app = express();
 
 // CORS配置
 const corsOptions = {
-  origin: ['https://to-do-list-andrewwang.vercel.app', 'http://localhost:5173'],
+  origin: function (origin, callback) {
+    console.log('Request origin:', origin);
+    const allowedOrigins = ['https://to-do-list-andrewwang.vercel.app', 'http://localhost:5173'];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Origin not allowed:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
   optionsSuccessStatus: 204
