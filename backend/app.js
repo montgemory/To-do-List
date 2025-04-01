@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
 app.use('/api/todos', todoRoutes);
 
 // 错误处理中间件
-app.use((err, req, req, res, next) => {
+app.use((err, req, res, next) => {
   console.error('Error details:', {
     message: err.message,
     stack: err.stack,
@@ -107,10 +107,31 @@ process.on('SIGTERM', () => {
 });
 
 // 启动服务器
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`服务器运行在端口: ${PORT}`);
-  console.log(`环境: ${process.env.NODE_ENV}`);
-  console.log(`前端URL: ${process.env.FRONTEND_URL}`);
-});
+const startServer = async () => {
+  try {
+    // 测试数据库连接
+    const db = require('./config/db');
+    await db.query('SELECT NOW()');
+    console.log('Database connection successful');
 
-module.exports = app; 
+    // 启动 HTTP 服务器
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`服务器运行在端口: ${PORT}`);
+      console.log(`环境: ${process.env.NODE_ENV}`);
+      console.log(`前端URL: ${process.env.FRONTEND_URL}`);
+    });
+
+    return server;
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// 启动应用
+startServer().then(server => {
+  module.exports = { app, server };
+}).catch(error => {
+  console.error('Application startup failed:', error);
+  process.exit(1);
+}); 
