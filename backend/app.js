@@ -41,7 +41,8 @@ app.get('/', (req, res) => {
   res.json({
     message: '欢迎使用TodoList API',
     status: 'healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    database: global.databaseConnected ? '已连接' : '未连接'
   });
 });
 
@@ -109,16 +110,24 @@ process.on('SIGTERM', () => {
 // 启动服务器
 const startServer = async () => {
   try {
-    // 测试数据库连接
-    const db = require('./config/db');
-    await db.query('SELECT NOW()');
-    console.log('Database connection successful');
+    // 尝试连接数据库，但即使失败也继续启动服务器
+    try {
+      const db = require('./config/db');
+      await db.query('SELECT NOW()');
+      console.log('Database connection successful');
+      global.databaseConnected = true;
+    } catch (dbError) {
+      console.error('Database connection failed:', dbError);
+      global.databaseConnected = false;
+      // 继续启动服务器，不要因为数据库连接失败而中止启动
+    }
 
     // 启动 HTTP 服务器
     const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`服务器运行在端口: ${PORT}`);
       console.log(`环境: ${process.env.NODE_ENV}`);
       console.log(`前端URL: ${process.env.FRONTEND_URL}`);
+      console.log(`数据库状态: ${global.databaseConnected ? '已连接' : '未连接'}`);
     });
 
     return server;
