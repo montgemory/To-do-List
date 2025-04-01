@@ -23,10 +23,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// 路由
-app.use('/api/todos', todoRoutes);
-
-// 根路由
+// 健康检查路由
 app.get('/', (req, res) => {
   res.json({
     message: '欢迎使用TodoList API',
@@ -35,9 +32,12 @@ app.get('/', (req, res) => {
   });
 });
 
+// API路由
+app.use('/api/todos', todoRoutes);
+
 // 错误处理中间件
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err);
   res.status(500).json({
     success: false,
     message: '服务器错误',
@@ -48,8 +48,26 @@ app.use((err, req, res, next) => {
 // 获取端口
 const PORT = process.env.PORT || 3002;
 
+// 进程错误处理
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+});
+
+// 优雅关闭
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM signal, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
 // 启动服务器
-app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`服务器运行在端口: ${PORT}`);
   console.log(`环境: ${process.env.NODE_ENV}`);
   console.log(`前端URL: ${process.env.FRONTEND_URL}`);
