@@ -13,21 +13,26 @@ const app = express();
 
 // CORS配置
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || ['http://localhost:5173', 'https://your-vercel-app.vercel.app'],
+  origin: process.env.FRONTEND_URL || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 204
 };
 
 // 中间件
-app.use(cors(corsOptions)); // 处理跨域
-app.use(express.json()); // 解析JSON请求体
+app.use(cors(corsOptions));
+app.use(express.json());
 
 // 路由
 app.use('/api/todos', todoRoutes);
 
 // 根路由
 app.get('/', (req, res) => {
-  res.send('欢迎使用TodoList API');
+  res.json({
+    message: '欢迎使用TodoList API',
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // 错误处理中间件
@@ -41,11 +46,13 @@ app.use((err, req, res, next) => {
 });
 
 // 获取端口
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在端口: ${PORT}`);
+  console.log(`环境: ${process.env.NODE_ENV}`);
+  console.log(`前端URL: ${process.env.FRONTEND_URL}`);
 });
 
 module.exports = app; 
