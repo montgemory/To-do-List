@@ -13,7 +13,7 @@ const app = express();
 
 // CORS配置
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || '*',
+  origin: ['https://to-do-list-andrewwang.vercel.app', 'http://localhost:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
   optionsSuccessStatus: 204

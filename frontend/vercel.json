@@ -9,6 +9,9 @@
   "github": {
     "silent": true
   },
+  "env": {
+    "VITE_API_URL": "https://to-do-list-production-1d6e.up.railway.app/api"
+  },
   "headers": [
     {
       "source": "/(.*)",
